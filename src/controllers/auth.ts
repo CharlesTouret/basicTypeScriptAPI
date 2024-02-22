@@ -1,4 +1,3 @@
-import User from './user';
 import jwt from 'jsonwebtoken';
 import {env} from '../utils/constants';
 import * as firebaseAuth from 'firebase/auth';
@@ -7,7 +6,13 @@ import {LoginOutput} from '../routes/validationSchemas/auth';
 
 async function login(email: string, password: string): Promise<LoginOutput> {
   try {
-    const user = await User.getUserFromId(email);
+    // #TODO: retrieve user from SupaBase and use a real value
+    const user = {
+      id: '12',
+      Nom: 'Test',
+      Prénom: 'Charles',
+      Email: 'charl.touret@gmail.com',
+    };
     const userId = user.id;
     const firebaseAuthClient = firebaseClient.getConnection();
     await firebaseAuth.signInWithEmailAndPassword(
