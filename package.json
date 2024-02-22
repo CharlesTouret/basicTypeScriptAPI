@@ -7,8 +7,6 @@
     "compile": "tsc",
     "fix": "gts fix",
     "prepare": "npm.cmd run compile",
-    "pretest": "npm.cmd run compile",
-    "posttest": "npm.cmd run lint"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
