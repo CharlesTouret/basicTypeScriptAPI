@@ -6,7 +6,7 @@
     "clean": "gts clean",
     "compile": "tsc",
     "fix": "gts fix",
-    "prepare": "npm.cmd run compile",
+    "prepare": "npm.cmd run compile"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
