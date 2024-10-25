@@ -6,6 +6,8 @@
     "test": "jest --forceExit --setupFiles dotenv/config",
     "dev": "ts-node src/index.ts",
     "build": "tsc",
+    "lint": "eslint 'src/**/*.{ts}' --fix",
+    "format": "prettier --write 'src/**/*.{ts}'",  
     "pullModel": "drizzle-kit introspect:pg --out ./src/models/db.ts --driver pg --connectionString=$DATA_BASE_URL",
     "db:migrate:create": "knex migrate:make --knexfile ./database/migrations/knexFile.ts",
     "db:migrate:list": "knex migrate:list --knexfile ./database/migrations/knexFile.ts",
