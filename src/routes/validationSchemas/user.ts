@@ -1,11 +1,10 @@
 import {z} from 'zod';
+// import {userSelectDb} from '../../types/user';
 
-export const getUserCalendarsInput = z.object({});
+export const getUserInput = z.object({
+  params: z.object({
+    id: z.number(),
+  }),
+});
 
-export const getUserCalendarsOutput = z.array(
-  z.object({
-    'lien vers vu': z.string(),
-    Nom: z.string(),
-  })
-);
-export type GetUserCalendarsOutput = z.infer<typeof getUserCalendarsOutput>;
+// export type GetUserOutput = z.infer<typeof userSelectDb>;

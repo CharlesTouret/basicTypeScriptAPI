@@ -1,44 +1,38 @@
 import User from './user';
 import jwt from 'jsonwebtoken';
-import {env} from '../utils/constants';
-import * as firebaseAuth from 'firebase/auth';
-import firebaseClient from './clients/firebase';
+import {AUTH_BAD_CREDENTIALS, AUTH_EMAIL_NOT_CONFIRMED, env, INTERNAL_SERVER_ERROR, NOT_FOUND, SUPABASE_INVALID_CREDENTIALS_ERROR, SUPABASE_NOT_CONFIRMED_EMAIL_ERROR} from '../utils/constants';
 import {LoginOutput} from '../routes/validationSchemas/auth';
+import { app } from './clients/supabase';
 
 async function login(email: string, password: string): Promise<LoginOutput> {
-  try {
-    const user = await User.getUserFromId(email);
-    const userId = user.id;
-    const firebaseAuthClient = firebaseClient.getConnection();
-    await firebaseAuth.signInWithEmailAndPassword(
-      firebaseAuthClient,
-      email,
-      password
-    );
-    const accessToken = jwt.sign(
-      {
-        userId,
-      },
-      env.secretKey,
-      {
-        algorithm: 'HS256',
-        expiresIn: env.expiresIn,
-      }
-    );
-    return {
+  const {data, error} = await app.auth.signInWithPassword({
+    email,
+    password,
+  });
+  if (error?.message === SUPABASE_NOT_CONFIRMED_EMAIL_ERROR)
+    throw new Error(AUTH_EMAIL_NOT_CONFIRMED);
+  if (error?.message === SUPABASE_INVALID_CREDENTIALS_ERROR)
+    throw new Error(AUTH_BAD_CREDENTIALS);
+  const lowerCaseEmail = email.toLowerCase();
+  const user = await User.getUseByEmail(lowerCaseEmail);
+  const userId = user.id;
+  const accessToken = jwt.sign(
+    {
       userId,
-      fullName: user.Nom + user['Prénom'],
-      accessTokenExpiresIn: env.expiresIn,
-      accessToken: accessToken,
-    };
-  } catch (error: any) {
-    console.log(error);
-    throw Error(LOGIN_CANNOT_LOG);
-  }
+    },
+    env.secretKey,
+    {
+      algorithm: 'HS256',
+      expiresIn: env.expiresIn,
+    }
+  );
+  return {
+    userId,
+    name: user.name,
+    accessTokenExpiresIn: env.expiresIn,
+    accessToken: accessToken,
+  };
 }
-
-// FUNCTION ERRORS
-const LOGIN_CANNOT_LOG = 'CANNOT_LOG';
 
 export default {
   login,

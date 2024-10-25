@@ -1,0 +1,522 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "title": "HoPleisure Partner API",
+      "version": "1.0.0",
+      "description": "Partner API documentation for HoPleisure"
+    },
+    "basePath": "/",
+    "tags": [
+      {
+        "name": "activities",
+        "description": "Operations related to activities"
+      },
+      {
+        "name": "clients",
+        "description": "Operations related to clients"
+      },
+      {
+        "name": "bookings",
+        "description": "Operations related to bookings"
+      }
+    ],
+    "securityDefinitions": {
+      "BearerAuth": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "description": "Enter the token with the `Bearer ` prefix, e.g. \"Bearer abcde12345\"."
+      }
+    },
+    "security": [
+      {
+        "BearerAuth": []
+      }
+    ],
+    "paths": {
+      "/activities": {
+        "get": {
+          "tags": [
+            "activities"
+          ],
+          "summary": "Get all activities",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/GetActivityOutput"
+                }
+              }
+            },
+            "500": {
+              "description": "INTERNAL_SERVOR_ERROR"
+            }
+          }
+        }
+      },
+      "/activities/{activityId}": {
+        "get": {
+          "tags": [
+            "activities"
+          ],
+          "summary": "Get activity by ID",
+          "parameters": [
+            {
+              "name": "activityId",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "schema": {
+                "$ref": "#/definitions/GetActivityOutput"
+              }
+            },
+            "500": {
+              "description": "INTERNAL_SERVOR_ERROR"
+            }
+          }
+        }
+      },
+      "/activities/availabilities/{activityId}": {
+        "get": {
+          "tags": [
+            "activities"
+          ],
+          "summary": "Get availability of activity",
+          "parameters": [
+            {
+              "name": "activityId",
+              "in": "path",
+              "required": true,
+              "type": "string",
+              "default": "1"
+            },
+            {
+              "name": "from",
+              "in": "query",
+              "required": true,
+              "default": "2024-03-10",
+              "type": "string"
+            },
+            {
+              "name": "to",
+              "in": "query",
+              "required": true,
+              "default": "2024-03-17",
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/GetActivityAvailabilitiesOutput"
+                }
+              }
+            },
+            "500": {
+              "description": "INTERNAL_SERVOR_ERROR"
+            }
+          }
+        }
+      },
+      "/clients/{clientId}": {
+        "get": {
+          "tags": [
+            "clients"
+          ],
+          "summary": "Get client by ID",
+          "parameters": [
+            {
+              "name": "clientId",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "schema": {
+                "$ref": "#/definitions/GetClientOutput"
+              }
+            },
+            "404": {
+              "description": "NOT_FOUND"
+            },
+            "500": {
+              "description": "INTERNAL_SERVOR_ERROR"
+            }
+          }
+        }
+      },
+      "/bookings/{activityId}": {
+        "post": {
+          "tags": [
+            "bookings"
+          ],
+          "summary": "Create a booking",
+          "parameters": [
+            {
+              "name": "activityId",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            },
+            {
+              "name": "body",
+              "in": "body",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/PostBookingInput"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            },
+            "404": {
+              "description": "NOT_FOUND"
+            },
+            "422": {
+              "description": "NOT_AVAILABLE_SLOT | NOT_ENOUGHT_PLACES_ON_SLOT | DATE_IN_THE_PAST"
+            },
+            "500": {
+              "description": "INTERNAL_SERVOR_ERROR"
+            }
+          },
+          "consumes": ["application/json"],
+          "produces": ["application/json"]
+        },
+        "put": {
+          "tags": [
+            "bookings"
+          ],
+          "summary": "Update booking status",
+          "parameters": [
+            {
+              "name": "activityId",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            },
+            {
+              "name": "body",
+              "in": "body",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/PutBookingInput"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            },
+            "404": {
+              "description": "NOT_FOUND"
+            },
+            "500": {
+              "description": "INTERNAL_SERVOR_ERROR"
+            }
+          },
+          "consumes": ["application/json"],
+          "produces": ["application/json"]
+        }
+      }
+    },
+    "definitions": {
+      "LoginInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginOutput": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "accessTokenExpiresIn": {
+            "type": "string"
+          },
+          "accessToken": {
+            "type": "string"
+          }
+        }
+      },
+      "GetActivityOutput": {
+        "type": "object",
+        "properties": {
+          "activityId": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "clientName": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "additionnalInformations": {
+            "type": "string"
+          },
+          "maxCapacity": {
+            "type": "integer"
+          },
+          "slotType": {
+            "type": "string"
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "activityAddress": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "integer"
+          },
+          "activityPhoneNumber": {
+            "type": "string"
+          },
+          "activityEmail": {
+            "type": "string"
+          },
+          "cancelationPolicy": {
+            "type": "string"
+          },
+          "currencyCode": {
+            "type": "string"
+          },
+          "imagePaths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "prices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/PriceSchema"
+            }
+          },
+          "hours": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "slots": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/SlotSchema"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetActivityAvailabilitiesOutput": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "activityId": {
+              "type": "integer"
+            },
+            "date": {
+              "type": "string"
+            },
+            "slotType": {
+              "type": "string"
+            },
+            "availabilities": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Availability"
+              }
+            }
+          }
+        }
+      },
+      "PriceSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "activityId": {
+            "type": "integer"
+          },
+          "price": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "SlotSchema": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          }
+        }
+      },
+      "Availability": {
+        "type": "object",
+        "properties": {
+          "startTime": {
+            "type": "string"
+          },
+          "endTime": {
+            "type": "string"
+          },
+          "numberOfUnitBooked": {
+            "type": "integer"
+          },
+          "maxCapacity": {
+            "type": "integer"
+          }
+        }
+      },
+      "GetClientOutput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "loginEmail": {
+            "type": "string"
+          },
+          "contactEmail": {
+            "type": "string"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "contactPhoneNumber": {
+            "type": "string"
+          },
+          "companyAddress": {
+            "type": "string"
+          },
+          "logoUrl": {
+            "type": "string"
+          },
+          "currencyCode": {
+            "type": "string"
+          },
+          "bankName": {
+            "type": "string"
+          },
+          "iban": {
+            "type": "string"
+          },
+          "bic": {
+            "type": "string"
+          }
+        }
+      },
+      "visitorInfos": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          }
+        }
+      },
+      "bookingItem": {
+        "type": "object",
+        "properties": {
+          "numberOfUnit": {
+            "type": "integer"
+          },
+          "priceName": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "to": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["BOOKED", "PENDING", "CANCELED"]
+          }
+        }
+      },
+      "PostBookingInput": {
+        "type": "object",
+        "properties": {
+          "visitorInfos": {
+            "$ref": "#/definitions/visitorInfos"
+          },
+          "bookings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/bookingItem"
+            }
+          }
+        }
+      },
+      "PutBookingInput": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["BOOKED", "PENDING", "CANCELED"]
+          }
+        }
+      }
+    }
+  }
+  

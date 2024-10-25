@@ -1,28 +1,40 @@
 import {Request, Response, NextFunction} from 'express';
 import * as jwt from 'jsonwebtoken';
 import {env} from '../../utils/constants';
+import * as Sentry from '@sentry/node';
+import {EnvironmentNamesEnum} from '../../utils/helpers';
 
 export interface AuthRequest extends Request {
   user: any;
 }
 
 export const auth =
-  () => (req: AuthRequest, res: Response, next: NextFunction) => {
+  (bypassAuth: boolean) =>
+  (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const decodedToken = getDecodedToken(req);
       if (decodedToken) {
         req.user = decodedToken;
+        if (
+          env.environment === EnvironmentNamesEnum.STAGING ||
+          env.environment === EnvironmentNamesEnum.PRODUCTION
+        )
+          // identify the user in Sentry
+          Sentry.setUser({id: req.user.userId});
         return next();
-      } else {
+      } else if (!bypassAuth) {
         return res.status(401).send('UNAUTHORIZED');
       }
+
+      return next();
     } catch (err) {
-      console.log(err);
-      return res.status(500).send(err);
+      return next(err);
     }
   };
 
-function getDecodedToken(req: Request): string | boolean | jwt.JwtPayload {
+export function getDecodedToken(
+  req: Request
+): string | boolean | jwt.JwtPayload {
   try {
     const {authorization} = req.headers;
     if (!authorization || !authorization.includes('Bearer ')) return false;

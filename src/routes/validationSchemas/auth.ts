@@ -9,7 +9,7 @@ export const loginInput = z.object({
 
 export const loginOutput = z.object({
   userId: z.string(),
-  fullName: z.string(),
+  name: z.string(),
   accessTokenExpiresIn: z.string(),
   accessToken: z.string(),
 });

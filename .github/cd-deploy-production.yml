@@ -1,0 +1,19 @@
+# name: Deploy To Production
+# on:
+#   push:
+#     branches:
+#       - main
+# jobs:
+#   deploy:
+#     name: Deploy API To Production
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 30
+#     steps:
+#       - name: Prepare SSH & Deploy
+#         run: |
+#           mkdir -p ~/.ssh
+#           ssh-keyscan github.com >> ~/.ssh/known_hosts
+#           ssh-keyscan 51.38.187.102 >> ~/.ssh/known_hosts
+#           eval `ssh-agent`
+#           ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+#           ssh uniseed@51.38.187.102 'cd uniseed-api/ && git pull --rebase && git checkout main && yarn install --frozen-lockfile && rm -r ./dist && yarn build && yarn db:migrate:up:all && pm2 restart main'

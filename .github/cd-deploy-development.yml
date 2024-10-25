@@ -1,0 +1,19 @@
+# name: Deploy To Development
+# on:
+#   push:
+#     branches:
+#       - development
+# jobs:
+#   deploy:
+#     name: Deploy API To Development
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 30
+#     steps:
+#       - name: Prepare SSH & Deploy
+#         run: |
+#           mkdir -p ~/.ssh
+#           ssh-keyscan github.com >> ~/.ssh/known_hosts
+#           ssh-keyscan 52.47.122.44 >> ~/.ssh/known_hosts
+#           eval `ssh-agent`
+#           ssh-add - <<< "${{ secrets.SSH_DEV_PRIVATE_KEY }}"
+#           ssh ubuntu@52.47.122.44 'eval `ssh-agent` && ssh-add ./.ssh/api_dev_deploy_key && cd uniseed-api/ && git pull --rebase && git checkout development && yarn install --frozen-lockfile && rm -r ./dist && yarn build && yarn db:migrate:up:all && pm2 restart main'

@@ -1,6 +1,20 @@
+export enum EnvironmentNamesEnum {
+  LOCAL = 'LOCAL',
+  STAGING = 'STAGING',
+  PRODUCTION = 'PRODUCTION',
+  TEST = 'TEST',
+}
+
 interface EnvVariableConst {
+  port: string;
   secretKey: string;
   expiresIn: string;
+  sentryLink: string;
+  databaseUrl: string;
+  supabaseUrl: string;
+  supabaseKey: string;
+  supabaseClientBucketUrl: string;
+  environment: EnvironmentNamesEnum;
 }
 
 const loadEnvVariablesInConst = (): EnvVariableConst => {

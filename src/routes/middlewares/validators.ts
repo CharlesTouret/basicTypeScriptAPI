@@ -11,8 +11,8 @@ export const validateSchema =
     try {
       const parsedSchema = schema.safeParse({
         body: req.body,
-        query: req.query,
-        params: req.params,
+        query: decodeQueryAndParamsUriStrings(req.query),
+        params: decodeQueryAndParamsUriStrings(req.params),
       });
 
       if (!parsedSchema.success) {
@@ -24,3 +24,12 @@ export const validateSchema =
       return res.status(400).send(err);
     }
   };
+
+// thanks to this method we can provides value with blank spaces in query and params parameters
+const decodeQueryAndParamsUriStrings = (queryOrParamObject: any) => {
+  const decodedObject: any = {};
+  for (const key of Object.keys(queryOrParamObject)) {
+    decodedObject[key] = decodeURIComponent(queryOrParamObject[key]);
+  }
+  return decodedObject;
+};

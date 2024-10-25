@@ -1,23 +1,26 @@
-import express, {Response} from 'express';
+import express, {Response, NextFunction} from 'express';
 const router = express.Router();
 import User from '../controllers/user';
-import {getUserCalendarsInput} from './validationSchemas/user';
+import {getUserInput} from './validationSchemas/user';
 import {validateSchema} from './middlewares/validators';
 import {AuthRequest, auth} from './middlewares/auth';
+import { NOT_FOUND } from '../utils/constants';
 
 router.get(
-  '/',
+  '/:userId',
   //@ts-ignore
-  [auth(), validateSchema(getUserCalendarsInput)],
-  async (req: AuthRequest, res: Response) => {
+  [auth(), validateSchema(getUserInput)],
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const user = await User.getUserFromId(req.user.userId);
+      //@ts-ignore
+      const user = await User.getUserFromId(req.params.userId); // we should type user with GetUserOutput after we will have follow the readme
       return res.status(200).send(user);
-    } catch (err) {
-      console.log(err);
-      return res
-        .status(500)
-        .send({ok: false, code: 'SERVER_ERROR', error: 'error'});
+    } catch (err: any) {
+      if (
+        err.message === NOT_FOUND
+      )
+        return res.status(404).send({error: err.message});
+      return next(err);
     }
   }
 );
